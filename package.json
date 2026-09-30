@@ -9,7 +9,20 @@
         "postinstall": "npm run build:mediasoup-client",
         "start": "node app/server.js",
         "start-dev": "nodemon app/server.js",
-        "test": "echo \"Error: no test specified\" && exit 1"
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "docker:build": "COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker build --tag mirotalk/bro:latest .",
+        "docker:rmi": "docker images |grep '<none>' |awk '{print $3}' |xargs docker rmi",
+        "docker:push": "docker push mirotalk/bro:latest",
+        "docker:pull": "docker pull mirotalk/bro:latest",
+        "docker:rmc": "docker container rm mirotalk --force",
+        "docker:run": "docker run -d -p 3016:3016 --name mirotalk mirotalk/bro:latest",
+        "docker:run-local": "docker run --rm -it -p 3016:3016 --name mirotalk mirotalk/bro:latest",
+        "docker:rune": "docker run -d -p 3016:3016 -v .env:/src/.env:ro --name mirotalk mirotalk/bro:latest",
+        "docker:rune-local": "docker run --rm -it -p 3016:3016 -v .env:/src/.env:ro --name mirotalk mirotalk/bro:latest",
+        "docker:run-vm": "docker run -d -p 3016:3016 -v .env:/src/.env:ro -v ./app/:/src/app/:ro -v ./public/:/src/public/:ro --name mirotalk mirotalk/bro:latest",
+        "docker:run-vm-local": "docker run --rm -it -p 3016:3016 -v .env:/src/.env:ro -v ./app/:/src/app/:ro -v ./public/:/src/public/:ro --name mirotalk mirotalk/bro:latest",
+        "docker:start": "docker start mirotalk",
+        "docker:stop": "docker stop mirotalk"
     },
     "repository": {
         "type": "git",
