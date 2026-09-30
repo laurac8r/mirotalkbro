@@ -10,6 +10,7 @@
         "start": "node app/server.js",
         "start-dev": "nodemon app/server.js",
         "test": "echo \"Error: no test specified\" && exit 1",
+        "local-tunnel": "cloudflared tunnel --url http://localhost:3016",
         "docker:build": "COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker build --tag mirotalk/bro:latest .",
         "docker:rmi": "docker images |grep '<none>' |awk '{print $3}' |xargs docker rmi",
         "docker:push": "docker push mirotalk/bro:latest",
