@@ -1,6 +1,8 @@
 # Build stage - compile mediasoup worker and bundle mediasoup-client
 FROM node:24-slim AS build
 
+EXPOSE 3016
+
 WORKDIR /src
 
 # Build mediasoup worker from source for multi-arch support
@@ -28,7 +30,7 @@ ENV UV_THREADPOOL_SIZE=8
 # Prevent Bun from flooding the Colima virtual network gateway
 ENV BUN_CONFIG_MAX_HTTP_REQUESTS=$UV_THREADPOOL_SIZE
 
-RUN npm install -g bun
+RUN npm i -g bun
 
 # Install all dependencies smoothly without overloading the virtual disk I/O (devDeps needed for esbuild postinstall), then prune
 RUN --mount=type=cache,target=/root/.bun/install/cache \
