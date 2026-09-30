@@ -1,5 +1,5 @@
 # Build stage - compile mediasoup worker and bundle mediasoup-client
-FROM node:24-slim AS build
+FROM oven/bun:1.4.2-slim AS build
 
 WORKDIR /src
 
@@ -19,13 +19,24 @@ COPY package*.json .
 COPY .env.template ./.env
 COPY public public
 
-# Install all dependencies (devDeps needed for esbuild postinstall), then prune
-RUN npm ci --silent \
-    && npm prune --omit=dev \
-    && npm cache clean --force
+# 1. Optimize Docker layer caching
+COPY package.json bun.lock ./
+
+# Restrict Bun to perfectly match the Colima CPU allocation
+ENV UV_THREADPOOL_SIZE=8
+
+# Prevent Bun from flooding the Colima virtual network gateway
+ENV BUN_CONFIG_MAX_HTTP_REQUESTS=$UV_THREADPOOL_SIZE
+
+# Install all dependencies smoothly without overloading the virtual disk I/O (devDeps needed for esbuild postinstall), then prune
+RUN --mount=type=cache,target=/root/.bun/install/cache \
+    bun i \
+    --concurrent-scripts 2 \
+    --verbose \
+    && bun prune --omit=dev
 
 # Production stage - minimal runtime image
-FROM node:24-slim
+FROM oven/bun:1.4.2-slim
 
 WORKDIR /src
 
@@ -52,4 +63,4 @@ COPY --chown=node:node --from=build /src/public/js/mediasoup-client.js /src/publ
 USER node
 
 # Set default command to start the application
-CMD ["npm", "start"]
+CMD ["bun", "start"]
